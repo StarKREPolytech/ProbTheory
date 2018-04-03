@@ -15,6 +15,8 @@ public final class Engine {
 
     private String alphabetPath = "./src/input/alphabet.txt";
 
+    private static final double NOIZE = 0.151;
+
     @Inject
     @Signal
     private Supplier signalSupplier;
@@ -26,7 +28,9 @@ public final class Engine {
     public final void getSolution(){
         final List<String> alphabet = alphabetSupplier.load(alphabetPath);
         final List<String> signals = signalSupplier.load(signalPath);
-        System.out.println(alphabet.size());
-        System.out.println(signals.size());
+    }
+
+    private double getConditionProbability(final String signal, final String symbol){
+
     }
 }
