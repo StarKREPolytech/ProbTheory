@@ -3,21 +3,18 @@ package client;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import supplier.SignalSupplier;
-
-import java.util.List;
+import engine.Engine;
+import module.SupplierModule;
 
 public final class Client {
 
     @Inject
-    private SignalSupplier signalSupplier;
+    private Engine engine;
 
-    public static void main(String[] args) {
-        final Injector injector = Guice.createInjector();
+    public static void main(final String[] args) {
+        final Injector injector = Guice.createInjector(new SupplierModule());
         final Client client = injector.getInstance(Client.class);
-        final SignalSupplier signalSupplier = client.signalSupplier;
-        final List<String> signals = signalSupplier.load("./src/input/inputSignals.txt");
-        System.out.println(signals.toString());
+        final Engine engine = client.engine;
+        engine.getSolution();
     }
-
 }
