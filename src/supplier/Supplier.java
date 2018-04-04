@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface Supplier {
+public interface Supplier<T> {
 
-    default List<String> load(final String filePath) {
-        if (getSignals().isEmpty()){
+    default List<T> load(final String filePath) {
+        if (getElements().isEmpty()){
             final File file = new File(filePath);
             final FileReader fileReader;
             try {
@@ -19,17 +19,21 @@ public interface Supplier {
                 final BufferedReader bufferedReader = new BufferedReader(fileReader);
                 final Stream<String> stringStream = bufferedReader.lines();
                 final List<String> strings = stringStream.collect(Collectors.toList());
-                setSignals(parse(strings));
+                setMessages(parse(strings));
             } catch (final FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
-        return getSignals();
+        return getElements();
     }
 
-    List<String> parse(final List<String> strings);
+    default int getCapacity(){
+        return getElements().size();
+    }
 
-    List<String> getSignals();
+    List<T> parse(final List<String> strings);
 
-    void setSignals(final List<String> signals);
+    List<T> getElements();
+
+    void setMessages(final List<T> messages);
 }

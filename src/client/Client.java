@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import engine.Engine;
+import engine.Task.Task;
 import module.SupplierModule;
 
 public final class Client {
@@ -15,6 +16,7 @@ public final class Client {
         final Injector injector = Guice.createInjector(new SupplierModule());
         final Client client = injector.getInstance(Client.class);
         final Engine engine = client.engine;
-        engine.getSolution();
+        engine.getSolution(Task.UNIFORM);
+        engine.getSolution(Task.INDIVIDUAL);
     }
 }

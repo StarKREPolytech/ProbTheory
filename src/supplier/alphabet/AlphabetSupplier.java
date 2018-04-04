@@ -1,9 +1,11 @@
-package supplier;
+package supplier.alphabet;
+
+import supplier.Supplier;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class AlphabetSupplier implements Supplier{
+public final class AlphabetSupplier implements Supplier<String> {
 
     private List<String> signals = new ArrayList<>();
 
@@ -22,12 +24,12 @@ public final class AlphabetSupplier implements Supplier{
     }
 
     @Override
-    public final List<String> getSignals() {
+    public final List<String> getElements() {
         return signals;
     }
 
     @Override
-    public final void setSignals(final List<String> signals) {
-        this.signals = signals;
+    public final void setMessages(final List<String> messages) {
+        this.signals = messages;
     }
 }
