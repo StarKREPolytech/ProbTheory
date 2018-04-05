@@ -60,4 +60,27 @@ public final class ProbabilityFunctionsUtility {
     static double countInformationQuantity(final double entropy, final double condEntropy){
         return entropy - condEntropy;
     }
+
+    static double countAverageInformationQuantity(final List<Double> condProbArray
+            , final List<Double> probArray, final double condEntropy){
+        double sum = 0;
+        for (int i = 0; i < condProbArray.size(); i++){
+            sum += condProbArray.get(i) * (Math.log10(probArray.get(i)) / Math.log10(2));
+        }
+        sum = sum * (-1);
+        return sum - condEntropy;
+    }
+
+    static double countLetterProb(final List<Double> probArray, final List<Double> probCondArray){
+        double sum = 0;
+        for (int i = 0; i < probArray.size(); i++){
+            sum += probArray.get(i) * probCondArray.get(i);
+        }
+        return sum;
+    }
+
+    static double countAverageEntropy(final List<Double> letterProbArray, final List<Double> probByesArray){
+        double sum = 0;
+
+    }
 }
