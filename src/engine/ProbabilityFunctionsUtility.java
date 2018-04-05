@@ -14,12 +14,9 @@ public final class ProbabilityFunctionsUtility {
         double product = 1;
         if (inputBits.length == symbolBits.length) {
             for (int i = 0; i < inputBits.length; i++) {
-                System.out.println(product);
                 if (inputBits[i] == symbolBits[i]) {
-                    System.out.println("clear");
                     product *= CLEAR_PROB;
                 } else {
-                    System.out.println("noise");
                     product *= NOISE_PROB;
                 }
             }
@@ -40,6 +37,8 @@ public final class ProbabilityFunctionsUtility {
             }
             numerator = probList.get(index) * condProbList.get(index);
             denominator = sum;
+//            System.out.println("Numerator: " + numerator);
+//            System.out.println("Denominator:" + denominator);
             return numerator / denominator;
         } else {
             throw new IncomparableTypesExeption();

@@ -36,7 +36,7 @@ public final class MessageSupplier implements Supplier<Message> {
     }
 
     @Override
-    public final void setMessages(final List<Message> messages) {
+    public final void setElements(final List<Message> messages) {
         this.messages = messages;
     }
 }

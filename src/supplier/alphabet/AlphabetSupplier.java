@@ -29,7 +29,7 @@ public final class AlphabetSupplier implements Supplier<String> {
     }
 
     @Override
-    public final void setMessages(final List<String> messages) {
+    public final void setElements(final List<String> messages) {
         this.signals = messages;
     }
 }

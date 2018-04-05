@@ -9,7 +9,7 @@ public final class Message {
 
     private final List<String> letters;
 
-    Message(final int number, final List<String> letters){
+    public Message(final int number, final List<String> letters){
         this.number = number;
         this.letters = letters;
     }

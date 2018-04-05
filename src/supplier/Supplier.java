@@ -19,7 +19,7 @@ public interface Supplier<T> {
                 final BufferedReader bufferedReader = new BufferedReader(fileReader);
                 final Stream<String> stringStream = bufferedReader.lines();
                 final List<String> strings = stringStream.collect(Collectors.toList());
-                setMessages(parse(strings));
+                setElements(parse(strings));
             } catch (final FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -27,13 +27,9 @@ public interface Supplier<T> {
         return getElements();
     }
 
-    default int getCapacity(){
-        return getElements().size();
-    }
-
     List<T> parse(final List<String> strings);
 
     List<T> getElements();
 
-    void setMessages(final List<T> messages);
+    void setElements(final List<T> elements);
 }

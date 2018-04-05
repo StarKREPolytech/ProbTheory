@@ -16,7 +16,6 @@ public final class Client {
         final Injector injector = Guice.createInjector(new SupplierModule());
         final Client client = injector.getInstance(Client.class);
         final Engine engine = client.engine;
-        engine.getSolution(Task.UNIFORM);
-        engine.getSolution(Task.INDIVIDUAL);
+        engine.makeResponse(Task.UNIFORM);
     }
 }
