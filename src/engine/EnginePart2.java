@@ -1,0 +1,423 @@
+package engine;
+
+import annotations.Alphabet;
+import annotations.MessageSignal;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import engine.Task.Task;
+import exeptions.IncomparableTypesExeption;
+import supplier.Supplier;
+import supplier.packageSupplier.Message;
+
+import java.util.*;
+
+@Singleton
+public final class EnginePart2 {
+
+    @Inject
+    @MessageSignal
+    private Supplier<Message> signalMessageSupplier;
+
+    @Inject
+    @Alphabet
+    private Supplier<String> alphabetSupplier;
+
+    private String signalPath = "./src/resources/input/inputSignals.txt";
+
+    private String alphabetPath = "./src/resources/input/alphabet.txt";
+
+    static final double NOISE_PROB = 0.151;
+
+    static final double CLEAR_PROB = 0.849;
+
+    static final double RATIONING_COEFFICIENT = 100;
+
+    private List<Double> aprioriProbList;
+
+    private final List<String> outputMessage = new ArrayList<>();
+
+    private List<String> makeLongAlphabet(final int messageCount, final List<String> alphabet) {
+        final List<String> longAlphabet = new ArrayList<>();
+        for (final String letter : alphabet) {
+            final StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < messageCount; i++) {
+                stringBuilder.append(letter);
+            }
+            longAlphabet.add(stringBuilder.toString());
+        }
+        return longAlphabet;
+    }
+
+    private List<String> makeLongLetters(final List<Message> messages) {
+        final List<String> longMessage = new ArrayList<>();
+        for (int i = 0; i < 229; i++) {
+            final StringBuilder stringBuilder = new StringBuilder();
+            for (final Message message : messages) {
+                final String letter = message.getLetters().get(i);
+                stringBuilder.append(letter);
+            }
+            longMessage.add(stringBuilder.toString());
+        }
+        return longMessage;
+    }
+
+
+    public final void makeResponse(final Task task) {
+        final List<String> alphabet = alphabetSupplier.load(alphabetPath);
+        final List<Message> messages = signalMessageSupplier.load(signalPath);
+
+
+        final List<String> longAlphabet = makeLongAlphabet(messages.size(), alphabet);
+        final List<String> longLetters = makeLongLetters(messages);
+
+        switch (task) {
+            case UNIFORM:
+                final int alphabetCapacity = alphabet.size();
+                setUniformDistribution(alphabetCapacity);
+                break;
+            case INDIVIDUAL:
+                setIndividualDistribution();
+        }
+        try {
+            countCondEntropy(longAlphabet, longLetters);
+        } catch (final IncomparableTypesExeption incomparableTypesExeption) {
+            incomparableTypesExeption.printStackTrace();
+        }
+    }
+
+//    private void countAposteriori(final List<String> alphabet, final List<String> longLetters)
+//            throws IncomparableTypesExeption {
+//        final String firstLetter = longLetters.get(0);
+//        final char[] inputBits = Utils.convertToCharArray(firstLetter);
+//        final List<Double> condProbList = new ArrayList<>();
+//        final List<Double> probBayesList = new ArrayList<>();
+//        for (final String symbol : alphabet) {
+//            final char[] symbolBits = Utils.convertToCharArray(symbol);
+//            final double condProbability = ProbabilityFunctionsUtility.countBitProb(inputBits, symbolBits);
+//            condProbList.add(condProbability);
+//        }
+//        for (int i = 0; i < alphabet.size(); i++) {
+//            final double aposterioriProb = ProbabilityFunctionsUtility
+//                    .countByesProb(i, aprioriProbList, condProbList);
+//            probBayesList.add(aposterioriProb);
+//        }
+//        //output:
+//        System.out.println("Message :" + "\nAposteriori probability:");
+//        int j = 1;
+//        for (final double response : probBayesList) {
+////                System.out.println(response);
+//            System.out.println("(" + j + ";" + response + ")");
+//            j++;
+//        }
+//        int symbolNumber = 0;
+//        double max = 0;
+//        for (int i = 0; i < probBayesList.size(); i++) {
+//            if (probBayesList.get(i) > max) {
+//                max = probBayesList.get(i);
+//                symbolNumber = i;
+//            }
+//        }
+////        System.out.println("Symbol: " + symbolNumber);
+////            this.aprioriProbList = probBayesList;
+//
+//    }
+
+
+//
+
+
+//    private void countCondEntropy(final List<String> alphabet, final List<String> longLetters)
+//            throws IncomparableTypesExeption {
+//
+//        final List<Double> letterProbArray = new ArrayList<>();
+//        final List<Double> condEntropyArray = new ArrayList<>();
+//        final List<Double> infoArray = new ArrayList<>();
+//        final String firstLetter = longLetters.get(0);
+//        final char[] inputBits = Utils.convertToCharArray(firstLetter);
+//        final List<Double> condProbList = new ArrayList<>();
+//        final List<Double> probBayesList = new ArrayList<>();
+//        for (final String symbol : alphabet) {
+//            final char[] symbolBits = Utils.convertToCharArray(symbol);
+//            final double condProbability = ProbabilityFunctionsUtility.countBitProb(inputBits, symbolBits);
+//            condProbList.add(condProbability);
+//        }
+//        for (int i = 0; i < alphabet.size(); i++) {
+//            final double aposterioriProb = ProbabilityFunctionsUtility
+//                    .countByesProb(i, aprioriProbList, condProbList);
+//            probBayesList.add(aposterioriProb);
+//        }
+//        final double entropy = ProbabilityFunctionsUtility.countEntropy(aprioriProbList);
+//        final double condEntropy = ProbabilityFunctionsUtility.countCondEntropy(probBayesList);
+//        final double info = ProbabilityFunctionsUtility.countInformationQuantity(entropy, condEntropy);
+//        infoArray.add(info);
+//        condEntropyArray.add(condEntropy);
+//        final double letterProb = ProbabilityFunctionsUtility.countLetterProb(aprioriProbList, condProbList);
+//        letterProbArray.add(letterProb);
+//
+//
+//        //output:
+////            System.out.println();
+////            System.out.println("Message №" + message.getNumber() + ":" + "\nCond Entropy probability:");
+////            final double conditionalEntropy = ProbabilityFunctionsUtility.countCondEntropy(probBayesList);
+////            final double probLetter = ProbabilityFunctionsUtility.countLetterProb(aprioriProbList, condProbList);
+////            condEntropyArray.add(conditionalEntropy);
+////            letterProbArray.add(probLetter);
+////        }
+//        final double avrgCondEntropy = ProbabilityFunctionsUtility
+//                .countAverageCondEntropy(letterProbArray, condEntropyArray);
+////            System.out.println(avrgCondEntropy);
+//
+//
+////        final double avrgCondEntropy = ProbabilityFunctionsUtility
+////                .countAverageCondEntropy(letterProbArray, condEntropyArray);
+////        System.out.println("AVRG_COND_ENT:" + avrgCondEntropy);
+////
+////
+//        System.out.println(letterProb);
+//        final double avrgInfo = entropy - avrgCondEntropy;
+//        System.out.println(avrgInfo);
+//    }
+
+
+//        private void countCondEntropy(final List<String> alphabet, final List<Message> messages)
+//            throws IncomparableTypesExeption {
+//
+//            final List<Double> letterProbArray = new ArrayList<>();
+//            final List<Double> condEntropyArray = new ArrayList<>();
+//            final List<Double> infoArray = new ArrayList<>();
+//            for (final Message message : messages) {
+//                final List<String> letters = message.getLetters();
+//                final String firstLetter = letters.get(0);
+//                final char[] inputBits = Utils.convertToCharArray(firstLetter);
+//                final List<Double> condProbList = new ArrayList<>();
+//                final List<Double> probBayesList = new ArrayList<>();
+//                for (final String symbol : alphabet) {
+//                    final char[] symbolBits = Utils.convertToCharArray(symbol);
+//                    final double condProbability = ProbabilityFunctionsUtility.countBitProb(inputBits, symbolBits);
+//                    condProbList.add(condProbability);
+//                }
+//                for (int i = 0; i < alphabet.size(); i++) {
+//                    final double aposterioriProb = ProbabilityFunctionsUtility
+//                            .countByesProb(i, aprioriProbList, condProbList);
+//                    probBayesList.add(aposterioriProb);
+//                }
+//                final double entropy = ProbabilityFunctionsUtility.countEntropy(aprioriProbList);
+//                final double condEntropy = ProbabilityFunctionsUtility.countCondEntropy(probBayesList);
+//                final double info = ProbabilityFunctionsUtility.countInformationQuantity(entropy, condEntropy);
+//                infoArray.add(info);
+//                condEntropyArray.add(condEntropy);
+//                final double letterProb = ProbabilityFunctionsUtility.countLetterProb(aprioriProbList, condProbList);
+////                System.out.println(condEntropy);
+////                System.out.println(letterProb);
+//                letterProbArray.add(letterProb);
+////                System.out.println("(" + message.getNumber() + ";" + ProbabilityFunctionsUtility.countAverageInformationQuantityAboutLetter(probBayesList, aprioriProbList, condEntropy) + ")");
+////                System.out.println();
+//                this.aprioriProbList = probBayesList;
+//
+//
+//                //output:
+////            System.out.println();
+////            System.out.println("Message №" + message.getNumber() + ":" + "\nCond Entropy probability:");
+////            final double conditionalEntropy = ProbabilityFunctionsUtility.countCondEntropy(probBayesList);
+////            final double probLetter = ProbabilityFunctionsUtility.countLetterProb(aprioriProbList, condProbList);
+////            condEntropyArray.add(conditionalEntropy);
+////            letterProbArray.add(probLetter);
+////        }
+////        final double avrgCondEntropy = ProbabilityFunctionsUtility
+////                .countAverageCondEntropy(letterProbArray, condEntropyArray);
+////            System.out.println(avrgCondEntropy);
+//            }
+////            final double avrgCondEntropy = ProbabilityFunctionsUtility
+////                    .countAverageCondEntropy(letterProbArray, condEntropyArray);
+////            System.out.println(avrgCondEntropy);
+//            final double avrgInfo = ProbabilityFunctionsUtility
+//                    .countAverageInfoAboutMessages(letterProbArray, infoArray);
+//            System.out.println(avrgInfo);
+//        }
+
+
+//    private void countIndependentAposteriori(final List<String> alphabet, final List<Message> messages)
+//            throws IncomparableTypesExeption {
+//        for (final Message message : messages) {
+//            final List<String> letters = message.getLetters();
+//            final String firstLetter = letters.get(0);
+//            final char[] inputBits = Utils.convertToCharArray(firstLetter);
+//            final List<Double> condProbList = new ArrayList<>();
+//            final List<Double> probBayesList = new ArrayList<>();
+//            for (final String symbol : alphabet) {
+//                final char[] symbolBits = Utils.convertToCharArray(symbol);
+//                final double condProbability = ProbabilityFunctionsUtility.countBitProb(inputBits, symbolBits);
+//                condProbList.add(condProbability);
+//            }
+//            for (int i = 0; i < alphabet.size(); i++) {
+//                final double aposterioriProb = ProbabilityFunctionsUtility
+//                        .countByesProb(i, aprioriProbList, condProbList);
+//                probBayesList.add(aposterioriProb);
+//            }
+//            //output:
+//            System.out.println();
+//            System.out.println("Message №" + message.getNumber() + ":" + "\nAposteriori probability:");
+//            int j = 1;
+//            for (final double response : probBayesList) {
+//                System.out.println(response);
+////                System.out.println("(" + j + ";" + response + ")");
+//                j++;
+//            }
+//        }
+//    }
+
+    private void setUniformDistribution(final int alphabetCapacity) {
+        this.aprioriProbList = new ArrayList<>();
+        final double denominator = (double) alphabetCapacity;
+        final double alphabetProb = 1 / denominator;
+        for (int i = 0; i < alphabetCapacity; i++) {
+            this.aprioriProbList.add(alphabetProb);
+        }
+    }
+
+    private void setIndividualDistribution() {
+        final List<Double> LETTER_FREQUENCY_LIST = Arrays.asList(0.006, 0.006, 0.006, 0.007, 0.007, 0.007, 0.007, 0.007
+                , 0.006, 0.006, 8.66, 1.51, 4.19, 1.41, 2.56, 8.00, 0.24, 0.78, 1.81, 7.45, 1.31, 3.47, 4.32, 3.29, 6.35
+                , 9.28, 3.35, 5.53, 5.45, 6.30, 2.90, 0.40, 0.92, 0.52, 1.27, 0.77, 0.49, 0.04, 2.11, 1.90, 0.17, 1.03
+                , 2.22, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006
+                , 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006
+                , 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006, 0.006);
+        this.aprioriProbList = new ArrayList<>() {{
+            for (final double e : LETTER_FREQUENCY_LIST) {
+                add(e / RATIONING_COEFFICIENT);
+            }
+        }};
+    }
+
+
+//    private double getConditionProbability(final String signal, final String symbol){
+//
+//    }
+
+
+    private final Map<Integer, String> map = new HashMap<>() {{
+        put(0, "0");
+        put(1, "1");
+        put(2, "2");
+        put(3, "3");
+        put(4, "4");
+        put(5, "5");
+        put(6, "6");
+        put(7, "7");
+        put(8, "8");
+        put(9, "9");
+        put(10, "А");
+        put(11, "Б");
+        put(12, "В");
+        put(13, "Г");
+        put(14, "Д");
+        put(15, "Е");
+        put(16, "Ё");
+        put(17, "Ж");
+        put(18, "З");
+        put(19, "И");
+        put(20, "Й");
+        put(21, "К");
+        put(22, "Л");
+        put(23, "М");
+        put(24, "Н");
+        put(25, "О");
+        put(26, "П");
+        put(27, "Р");
+        put(28, "С");
+        put(29, "Т");
+        put(30, "У");
+        put(31, "Ф");
+        put(32, "Х");
+        put(33, "Ц");
+        put(34, "Ч");
+        put(35, "Ш");
+        put(36, "Щ");
+        put(37, "Ь");
+        put(38, "Ы");
+        put(39, "Ъ");
+        put(40, "Э");
+        put(41, "Ю");
+        put(42, "Я");
+        put(43, "а");
+        put(44, "б");
+        put(45, "в");
+        put(46, "г");
+        put(47, "д");
+        put(48, "е");
+        put(49, "ё");
+        put(50, "ж");
+        put(51, "з");
+        put(52, "и");
+        put(53, "й");
+        put(54, "к");
+        put(55, "л");
+        put(56, "м");
+        put(57, "н");
+        put(58, "о");
+        put(59, "п");
+        put(60, "р");
+        put(61, "с");
+        put(62, "т");
+        put(63, "у");
+        put(64, "ф");
+        put(65, "х");
+        put(66, "ц");
+        put(67, "ч");
+        put(68, "ш");
+        put(69, "щ");
+        put(70, "ь");
+        put(71, "ы");
+        put(72, "ъ");
+        put(73, "э");
+        put(74, "ю");
+        put(75, "я");
+        put(76, ".");
+        put(77, ",");
+        put(78, "!");
+        put(79, ":");
+        put(80, "?");
+        put(81, "-");
+        put(82, "_");
+        put(83, "№");
+        put(84, "(");
+        put(85, ")");
+        put(86, " ");
+    }};
+
+
+//    private void getMessage(final List<String> alphabet, final List<String> longLetters)
+//            throws IncomparableTypesExeption {
+//        for (int x = 0; x < 229; x++){
+//            final String firstLetter = longLetters.get(x);
+//            final char[] inputBits = Utils.convertToCharArray(firstLetter);
+//            final List<Double> condProbList = new ArrayList<>();
+//            final List<Double> probBayesList = new ArrayList<>();
+//            for (final String symbol : alphabet) {
+//                final char[] symbolBits = Utils.convertToCharArray(symbol);
+//                final double condProbability = ProbabilityFunctionsUtility.countBitProb(inputBits, symbolBits);
+//                condProbList.add(condProbability);
+//            }
+//            for (int i = 0; i < alphabet.size(); i++) {
+//                final double aposterioriProb = ProbabilityFunctionsUtility
+//                        .countByesProb(i, aprioriProbList, condProbList);
+//                probBayesList.add(aposterioriProb);
+//            }
+//            int symbolNumber = 0;
+//            double max = 0;
+//            for (int i = 0; i < probBayesList.size(); i++) {
+//                if (probBayesList.get(i) > max) {
+//                    max = probBayesList.get(i);
+//                    symbolNumber = i;
+//                }
+//            }
+//            outputMessage.add(map.get(symbolNumber));
+//        }
+//        final StringBuilder stringBuilder = new StringBuilder();
+//        for (final String letter : outputMessage){
+//            stringBuilder.append(letter);
+//        }
+//        System.out.println(stringBuilder.toString());
+//    }
+
+}

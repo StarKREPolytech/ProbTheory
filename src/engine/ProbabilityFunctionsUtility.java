@@ -4,8 +4,8 @@ import exeptions.IncomparableTypesExeption;
 
 import java.util.List;
 
-import static engine.Engine.CLEAR_PROB;
-import static engine.Engine.NOISE_PROB;
+import static engine.EnginePart1.CLEAR_PROB;
+import static engine.EnginePart1.NOISE_PROB;
 
 public final class ProbabilityFunctionsUtility {
 
