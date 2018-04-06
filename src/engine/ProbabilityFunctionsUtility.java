@@ -53,19 +53,19 @@ public final class ProbabilityFunctionsUtility {
         return (-1) * sum;
     }
 
-    static double countCondEntropy(final List<Double> condProbArray){
-        return countEntropy(condProbArray);
+    static double countCondEntropy(final List<Double> probByesArray){
+        return countEntropy(probByesArray);
     }
 
     static double countInformationQuantity(final double entropy, final double condEntropy){
         return entropy - condEntropy;
     }
 
-    static double countAverageInformationQuantity(final List<Double> condProbArray
+    static double countAverageInformationQuantityAboutLetter(final List<Double> probByesArray
             , final List<Double> probArray, final double condEntropy){
         double sum = 0;
-        for (int i = 0; i < condProbArray.size(); i++){
-            sum += condProbArray.get(i) * (Math.log10(probArray.get(i)) / Math.log10(2));
+        for (int i = 0; i < probByesArray.size(); i++){
+            sum += probByesArray.get(i) * (Math.log10(probArray.get(i)) / Math.log10(2));
         }
         sum = sum * (-1);
         return sum - condEntropy;
@@ -79,8 +79,19 @@ public final class ProbabilityFunctionsUtility {
         return sum;
     }
 
-    static double countAverageEntropy(final List<Double> letterProbArray, final List<Double> probByesArray){
+    static double countAverageCondEntropy(final List<Double> letterProbArray, final List<Double> condEntropyArray){
         double sum = 0;
+        for (int i = 0; i < letterProbArray.size(); i++){
+            sum += letterProbArray.get(i) * condEntropyArray.get(i);
+        }
+        return sum;
+    }
 
+    static double countAverageInfoAboutMessages(final List<Double> probLetterArray, final List<Double> infoLetterArray){
+        double sum = 0;
+        for (int i = 0; i < probLetterArray.size(); i++){
+            sum += probLetterArray.get(i) * infoLetterArray.get(i);
+        }
+        return sum;
     }
 }
